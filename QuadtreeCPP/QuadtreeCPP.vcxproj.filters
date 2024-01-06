@@ -15,7 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Quadtree.h">
+    <ClInclude Include="ImageQuadtree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
