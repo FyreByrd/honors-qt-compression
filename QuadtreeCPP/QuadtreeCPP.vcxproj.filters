@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\test_images">
+      <UniqueIdentifier>{ef4d30cc-1c00-4512-840a-5baf1dd71d70}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageQuadtree.h">
@@ -21,5 +24,18 @@
     <ClInclude Include="QuadNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CImg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="test_images\splotches.png">
+      <Filter>Resource Files\test_images</Filter>
+    </Image>
   </ItemGroup>
 </Project>
