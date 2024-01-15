@@ -1,18 +1,11 @@
 #!/usr/bin/python3
 from PIL import Image
 from numpy import asarray
+from quad_image import quad_image
 
 if __name__=="__main__":
-    image = Image.open("test.png")
+    img = Image.open("test.png")
 
-    numpydata = asarray(image)
-    
-    print(type(numpydata))
-    print(numpydata.shape)
+    npdata = asarray(img)
 
-    pilImage = Image.fromarray(numpydata)
-    print(type(pilImage))
-    
-    # Let us check  image details
-    print(pilImage.mode)
-    print(pilImage.size)
+    qi = quad_image(npdata)
