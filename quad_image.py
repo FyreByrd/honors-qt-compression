@@ -20,8 +20,8 @@ class quad_image:
         this.depth = depth(this.w, this.h) #depth of tree
         this.size = size(this.depth) #size of tree
         this.x = 2**this.depth #adjusted width of image for compression
-        this.channels = np.ndarray((dims[2], this.size), int) #array of sequential quadtrees
-        this.ch_flags = [bytearray()]*dims[2] #bit flags of node vs leaf for compression
+        this.channels = np.ndarray((dims[2], this.size), np.int8) #array of sequential quadtrees
+        this.ch_flags = np.zeros((dims[2], 1 + this.size // 8), dtype=np.int8) #bit flags of node vs leaf for compression
         fill = this.size - this.x ** 2
         for c in range(dims[2]):
             for i in range(fill):
@@ -32,6 +32,9 @@ class quad_image:
                         this.channels[c][fill + x * this.x + y] = 0
                     else:
                         this.channels[c][fill + x * this.x + y] = arr[x][y][c]
+            this.ch_flags[c][1 + fill//8:] = 0xff
+            this.ch_flags[c][fill//8] |= 0xff >> fill % 8
+            this.ch_flags[c][this.size//8] &= 0xff << 8 * this.ch_flags.shape[1] - this.size
 
     def compress(this):
         pass
