@@ -9,3 +9,13 @@ if __name__=="__main__":
     npdata = asarray(img)
 
     qi = quad_image(npdata)
+
+    qi.write_file("test.png.qi")
+
+    q2 = quad_image()
+    q2.read_file("test.png.qi")
+
+    nd2 = q2.get_channels()
+
+    pi = Image.fromarray(nd2)
+    pi.save("s-test.png")
