@@ -28,8 +28,8 @@ class quad_image:
         dims = arr.shape
         if dims[0] <= 0:
             return
-        this.w = dims[0] #actual width of image
-        this.h = dims[1] #actual height of image
+        this.w = dims[1] #actual width of image
+        this.h = dims[0] #actual height of image
         this.depth = depth(this.w, this.h) #depth of tree
         this.size = size(this.depth) #size of tree
         this.x = 2**this.depth #adjusted width of image for compression
@@ -41,7 +41,7 @@ class quad_image:
                 this.channels[c][i] = 0
             for x in range(this.x):
                 for y in range(this.x):
-                    if x >= this.w or y >= this.h:
+                    if y >= this.w or x >= this.h:
                         this.channels[c][fill + x * this.x + y] = this.channels[c][fill + x * this.x + y - 1]#0
                     else:
                         this.channels[c][fill + x * this.x + y] = arr[x][y][c]
@@ -117,12 +117,15 @@ class quad_image:
             this.channels = np.zeros((ch, this.size), dtype=np.uint8) #array of sequential quadtrees
             this.ch_flags = np.zeros((ch, 1 + this.size // 8), dtype=np.uint8) #bit flags of node vs leaf for compression
             start = 9
+            fill = this.size - this.x ** 2
             for c in range(ch):
                 for i in range(this.size):
                     if i % 8 == 0:
                         this.ch_flags[c][i//8] = data[start]
                         start += 1
-                    if this.isleaf(c, i):
+                    if i >= fill and ((i-fill) >= (this.x * this.h) or ((i - fill) % this.x) >= this.w):
+                        this.channels[c][i] = this.channels[c][i-1]
+                    elif this.isleaf(c, i):
                         this.channels[c][i] = data[start]
                         start += 1
 
@@ -131,22 +134,23 @@ class quad_image:
             f.write(this.w.to_bytes(4, 'little'))
             f.write(this.h.to_bytes(4, 'little'))
             f.write(this.channels.shape[0].to_bytes(1))
+            fill = this.size - this.x ** 2
             for c in range(this.channels.shape[0]):
                 i = 0
                 while i < this.size:
                     if i % 8 == 0:
                         f.write(this.ch_flags[c][i//8])
-                    if this.isleaf(c, i):
+                    if this.isleaf(c, i) and (i < fill or ((i-fill) < (this.x * this.h) and ((i - fill) % this.x) < this.w)):
                         f.write(np.uint8(this.channels[c][i]))
                     i += 1
 
     def get_channels(this):
-        ret = np.ndarray((this.w, this.h, this.channels.shape[0]), np.uint8)
+        ret = np.ndarray((this.h, this.w, this.channels.shape[0]), np.uint8)
         dims = ret.shape
         mi = this.size - this.x ** 2
         for c in range(dims[2]):
             for x in range(this.x):
                 for y in range(this.x):
-                    if x < this.w and y < this.h:
+                    if y < this.w and x < this.h:
                         ret[x][y][c] = this.channels[c][mi + x * this.x + y]
         return ret
