@@ -28,7 +28,7 @@ for file in files:
         name = ".".join(file.split(".")[:-1])
         # Compress the image and encode is a binary file (any file extension can be chosen)
         t = time()
-        dims = compress_image_file("input/"+file, "output/"+name+"_qt.qid", iterations=50_000)
+        dims = compress_image_file("input/"+file, "output/"+name+"_qt.qid", iterations=64_000)
         l += ","+str(time() - t)
         l += ","+str(dims[0])+","+str(dims[1])
         raw = dims[0]*dims[1]*dims[2]
