@@ -12,9 +12,7 @@ from tqdm import trange
 from io import BytesIO
 import lzma
 
-
 # QuadTree data structures
-
 class QuadTreeNode:
     """ Base quad tree data structure that handles the positioning, subdivision and rendering of nodes. """
 
@@ -104,7 +102,6 @@ class QuadTreeNode:
             self.top_right_node.color
         ], axis=0))
 
-
 class CompressNode (QuadTreeNode):
     """ QuadTree node used for incrementally compressing an image. """
 
@@ -171,7 +168,6 @@ class ReconstructNode (QuadTreeNode):
     def _create_child_node(self, position, size):
         return ReconstructNode(position, size, self._subdivided_flags, self._colors)
 
-
 class ImageCompressor:
     """ Helper class that manages the CompressNodes and allows you to incrementally add detail. """
 
@@ -215,25 +211,15 @@ class ImageCompressor:
         subdivided_flags, colors = self.extract_data()
         return encode_image_data(self.width, self.height, subdivided_flags, colors)
 
-
 # Encoding / Decoding
-
 def encode_uint32(number: int) -> bytes:
     return number.to_bytes(4, byteorder="little", signed=False)
-
-
 def decode_uint32(data: bytes) -> int:
     return int.from_bytes(data, byteorder="little", signed=False)
-
-
 def encode_uint8(number: int) -> bytes:
     return number.to_bytes(1, byteorder="little", signed=False)
-
-
 def decode_uint8(data: bytes) -> int:
     return int.from_bytes(data, byteorder="little", signed=False)
-
-
 def encode_bitset(boolean_flags: list, stream: BytesIO):
     # Encode the number of booleans
     stream.write(encode_uint32(len(boolean_flags)))
@@ -252,8 +238,6 @@ def encode_bitset(boolean_flags: list, stream: BytesIO):
             byte |= 1 << bit_index
 
         stream.write(encode_uint8(byte))
-
-
 def decode_bitset(stream: BytesIO) -> list:
     flag_count = decode_uint32(stream.read(4))
     boolean_flags = []
@@ -270,8 +254,6 @@ def decode_bitset(stream: BytesIO) -> list:
             boolean_flags.append((byte & (1 << bit_index)) > 0)
 
     return boolean_flags
-
-
 def encode_image_data(width: int, height: int, subdivided_flags: list, colors: list) -> bytes:
     stream = BytesIO()
     # Encode the image dimensions.
@@ -290,8 +272,6 @@ def encode_image_data(width: int, height: int, subdivided_flags: list, colors: l
 
     blob = stream.getvalue()
     return lzma.compress(blob)
-
-
 def decode_image_data(compressed: bytes) -> tuple:
     stream = BytesIO(lzma.decompress(compressed))
 
@@ -312,9 +292,7 @@ def decode_image_data(compressed: bytes) -> tuple:
 
     return width, height, subdivided_flags, colors
 
-
 # Top-level compression and reconstruction functions
-
 def compress_image_data(
         image_data: np.array,
         iterations: int = 20000,
@@ -324,7 +302,6 @@ def compress_image_data(
     compressor.add_detail(iterations, detail_error_threshold)
     return compressor.draw()
 
-
 def compress_and_encode_image_data(
         image_data: np.array,
         iterations: int = 20000,
@@ -333,7 +310,6 @@ def compress_and_encode_image_data(
     compressor = ImageCompressor(image_data)
     compressor.add_detail(iterations, detail_error_threshold)
     return compressor.encode_to_binary()
-
 
 def reconstruct_quadtree(data: bytes) -> ReconstructNode:
     width, height, subdivided_flags, colors = decode_image_data(data)
@@ -345,7 +321,6 @@ def reconstruct_quadtree(data: bytes) -> ReconstructNode:
     image_data = np.zeros((height, width, 3), dtype=np.uint8)
     return ReconstructNode((0, 0), (width, height), subdivided_flags, colors)
 
-
 def reconstruct_image_data(data: bytes) -> np.array:
     tree = reconstruct_quadtree(data)
     width, height = tree.size
@@ -355,7 +330,6 @@ def reconstruct_image_data(data: bytes) -> np.array:
     return image_data
 
 # Simpler API
-
 def compress_image_file(
         image_path: str,
         output_path: str,
@@ -374,7 +348,6 @@ def compress_image_file(
 
     #return dimensions
     return dims
-
 
 def reconstruct_image_from_file(compressed_image_file: str) -> Image:
     with open(compressed_image_file, "rb") as file:
