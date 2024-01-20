@@ -11,9 +11,7 @@ files = [
     "Room",
     "stone",
     "StoneTile",
-    "test2",
     "test3",
-    "worst-square4",
     "worst-square64"
 ]
 
