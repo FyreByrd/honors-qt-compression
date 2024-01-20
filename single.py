@@ -1,5 +1,6 @@
 from quad_tree_compression import compress_image_file, reconstruct_image_from_file
 from os.path import getsize
+from time import time
 
 #name = "StoneTile"
 
@@ -19,7 +20,9 @@ for name in files:
     try:
         print(name)
         # Compress the image and encode is a binary file (any file extension can be chosen)
+        t = time()
         dims = compress_image_file("input/"+name+".png", "output/"+name+"_qt.qid", iterations=50_000)
+        print(" time: "+str(time() - t))
         print(" dim: "+str(dims))
         raw = dims[0]*dims[1]*dims[2]
         print(" raw: "+str(raw))
