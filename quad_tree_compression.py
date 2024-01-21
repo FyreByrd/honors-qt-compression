@@ -145,7 +145,6 @@ class CompressNode (QuadTreeNode):
             r, g, b = self.color
             colors.append((int(r), int(g), int(b)))
 
-
 class ReconstructNode (QuadTreeNode):
     """ QuadTree node for reconstructing a compressed image. """
 
