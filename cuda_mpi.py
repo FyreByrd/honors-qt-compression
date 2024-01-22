@@ -122,7 +122,7 @@ files = [
 
 results = None
 if rank == 0:
-    results = open("results.csv", "w")
+    results = open("results-mpi-cuda.csv", "w")
     results.write("file,ct,h,w,raw,cmp,og,cmp/raw,cmp/og,rt\n")
 
 for file in files:
