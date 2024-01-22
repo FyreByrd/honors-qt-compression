@@ -5,9 +5,6 @@ import math
 
 from sortedcontainers import SortedListWithKey
 
-# Progress bar
-from tqdm import trange
-
 # Binary encoding and compression
 from io import BytesIO
 import lzma
@@ -181,7 +178,7 @@ class ImageCompressor:
     def add_detail(self, max_iterations: int = 1, detail_error_threshold: float = 100):
         iterations = 0
 
-        for i in trange(max_iterations, leave=False):
+        for i in range(max_iterations):
             if not self.areas:
                 break
 
