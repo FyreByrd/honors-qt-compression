@@ -18,7 +18,7 @@ files = [
     "worst-square.png"
 ]
 
-results = open("results.csv", "w")
+results = open("results-cuda.csv", "w")
 results.write("file,ct,h,w,raw,cmp,og,cmp/raw,cmp/og,rt\n")
 
 for file in files:
