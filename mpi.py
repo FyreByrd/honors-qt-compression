@@ -107,17 +107,17 @@ def reconstruct_image_from_file(compressed_image_file: str) -> Image:
 #name = "StoneTile"
 
 files = [
+    "splotches.png",
     "cooper.jpg",
     "door.jpg",
-    "dragon.png",
-    "hills.png",
-    "mountains.png",
+    #"dragon.png",
+    #"hills.png",
+    #"mountains.png",
     "room.png",
-    "sandwich.jpg",
-    "science.jpg",
-    "splotches.png",
-    "tree.jpg",
-    "worst-square.png"
+    #"sandwich.jpg",
+    #"science.jpg",
+    #"tree.jpg",
+    #"worst-square.png"
 ]
 
 results = None
@@ -134,22 +134,22 @@ for file in files:
         name = ".".join(file.split(".")[:-1])
         # Compress the image and encode is a binary file (any file extension can be chosen)
         t = time()
-        dims = compress_image_file("input/"+file, "output/"+name+"_qt.qid", iterations=64_000)
+        dims = compress_image_file("input/"+file, "output-mpi/"+name+"_qt.qid", iterations=64_000)
         if rank == 0:
             l += ","+str(time() - t)
             l += ","+str(dims[0])+","+str(dims[1])
             raw = dims[0]*dims[1]*dims[2]
             l += ","+str(raw)
-            cmp = getsize("output/"+name+"_qt.qid")
+            cmp = getsize("output-mpi/"+name+"_qt.qid")
             l += ","+str(cmp)
             og = getsize("input/"+file)
             l += ","+str(og)+","+str(cmp / raw)+","+str(cmp / og)
             # Reconstruct the image from the binary file. (Returns a PIL.Image object)
             t = time()
-        image = reconstruct_image_from_file("output/"+name+"_qt.qid")
+        image = reconstruct_image_from_file("output-mpi/"+name+"_qt.qid")
         if rank == 0:
             l += ","+str(time() - t)
-            image.save("output/"+file)
+            image.save("output-mpi/"+file)
             results.write(l+"\n")
     except ValueError as ve:
         print(ve)
