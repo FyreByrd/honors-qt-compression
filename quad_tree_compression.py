@@ -4,6 +4,7 @@ from PIL import Image
 import math
 
 from sortedcontainers import SortedListWithKey
+from tqdm import trange
 
 # Binary encoding and compression
 from io import BytesIO
@@ -178,7 +179,7 @@ class ImageCompressor:
     def add_detail(self, max_iterations: int = 1, detail_error_threshold: float = 100):
         iterations = 0
 
-        for i in range(max_iterations):
+        for i in trange(max_iterations):
             if not self.areas:
                 break
 

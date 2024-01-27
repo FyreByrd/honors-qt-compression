@@ -4,6 +4,7 @@ from PIL import Image
 import math
 
 from sortedcontainers import SortedListWithKey
+from tqdm import trange
 
 # Binary encoding and compression
 from io import BytesIO
@@ -81,7 +82,7 @@ class QuadTreeNode:
         width, height = self.size
         end_x = start_x + width
         end_y = start_y + height
-        image_data[start_y: end_y, start_x: end_x] = self.color
+        image_data[start_y: end_y, start_x: end_x] = cp.asarray(self.color)
 
     def use_average_leaf_color(self):
         if not self.is_subdivided:
@@ -92,7 +93,7 @@ class QuadTreeNode:
         self.top_left_node.use_average_leaf_color()
         self.top_right_node.use_average_leaf_color()
 
-        self.color = tuple(cp.mean([
+        self.color = cp.asarray(cp.mean([
             self.bottom_left_node.color,
             self.bottom_right_node.color,
             self.top_left_node.color,
@@ -178,7 +179,7 @@ class ImageCompressor:
     def add_detail(self, max_iterations: int = 1, detail_error_threshold: float = 100):
         iterations = 0
 
-        for i in range(max_iterations):
+        for i in trange(max_iterations):
             if not self.areas:
                 break
 
@@ -284,7 +285,7 @@ def decode_image_data(compressed: bytes) -> tuple:
         r = decode_uint8(stream.read(1))
         g = decode_uint8(stream.read(1))
         b = decode_uint8(stream.read(1))
-        colors.append((r, g, b))
+        colors.append([r, g, b])
 
     return width, height, subdivided_flags, colors
 
@@ -349,5 +350,5 @@ def reconstruct_image_from_file(compressed_image_file: str) -> Image:
     with open(compressed_image_file, "rb") as file:
         data = file.read()
 
-    image_data = reconstruct_image_data(data)
+    image_data = cp.asnumpy(reconstruct_image_data(data))
     return Image.fromarray(image_data)
