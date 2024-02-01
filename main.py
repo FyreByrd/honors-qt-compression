@@ -75,7 +75,7 @@ def test_many():
             pi.save(str(th)+"-"+f)
 
 def test_one():
-    fname = "test-images/test"
+    fname = "test-images/room"
     ext = "png"
     img = Image.open(fname + "." + ext)
     npdata = asarray(img)
@@ -87,18 +87,18 @@ def test_one():
     print(" raw       : "+str(raw)+" bytes")
     t = time()
     qi = quad_image(npdata)
-    print(" construct : "+str(time() - t))
+    print(" construct : "+str(time() - t))#47 seconds
     t = time()
-    qi.write_file(fname + "." + ext + ".qi")
+    qi.write_file(fname + "." + ext + ".qi")#310 seconds
     print(" file      : "+str(time() - t))
     qf = getsize(fname + "." + ext + ".qi")
     print(" quad-image: "+str(qf)+" bytes")
 
     t = time()
     qi.compress()
-    print(" compress  : "+str(time() - t))
+    print(" compress  : "+str(time() - t))#233 seconds
     t = time()
-    qi.write_file(fname + "-c." + ext + ".qi")
+    qi.write_file(fname + "-c." + ext + ".qi") #5860 seconds
     print(" file      : "+str(time() - t))
     cmp = getsize(fname + "-c." + ext + ".qi")
     print(" compressed: "+str(cmp)+" bytes")
@@ -111,4 +111,4 @@ def test_one():
     pi.save(fname + "-s." + ext)
 
 if __name__=="__main__":
-    test_many()
+    test_one()
