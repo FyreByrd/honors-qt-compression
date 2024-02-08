@@ -1,114 +1,78 @@
-#!/usr/bin/python3
-from PIL import Image
-from numpy import asarray
-from quad_image import quad_image, child_indices, size
+from quad_image import quad_image
 from os.path import getsize
-from os import remove
 from time import time
 
-def test_many():
-    files = [
-        "test-images/test.png",
-        "test-images/ball.png",
-        "test-images/Basketball.png",
-        "test-images/Curvature.png",
-        #"test-images/Dragon.png",
-        "test-images/HighRappel.png",
-        "test-images/Room.png",
-        "test-images/stone.png",
-        "test-images/StoneTile.png",
-        "test-images/test2.png",
-        "test-images/test3.png",
-        "test-images/worst-square4.png",
-        "test-images/worst-square64.png"
-    ]
+from PIL import Image
+import numpy as np
 
-    thresholds = [0,1,2,4,8,16,32,64]
+def compress_image_file(
+        image_path: str,
+        output_path: str):
 
-    for th in thresholds:
-        print("threshold: "+str(th))
-        for f in files:
-            print(f)
-            img = Image.open(f)
-            png = getsize(f)
-            npdata = asarray(img)
-            print(" dimensions: "+str(npdata.shape))
-            print(" PNG       : "+str(png)+" bytes")
-            dims = npdata.shape
-            raw = dims[0] * dims[1] * dims[2]
-            print(" raw       : "+str(raw)+" bytes")
-            t = time()
-            qi = quad_image(npdata, th)
-            print(" construct : "+str(time() - t))
-            t = time()
-            qi.write_file("aaa")
-            print(" file      : "+str(time() - t))
-            qf = getsize("aaa")
-            print(" quad-image: "+str(qf)+" bytes")
-            
-            t = time()
-            qi.compress()
-            print(" compress  : "+str(time() - t))
-            t = time()
-            qi.write_file("bbb")
-            print(" file      : "+str(time() - t))
-            cmp = getsize("bbb")
-            print(" compressed: "+str(cmp)+" bytes")
+    image = Image.open(image_path)
+    image_data = np.array(image)
 
-            remove("aaa")
+    dims = image_data.shape
 
-            print(" qi/raw    : "+str(qf/raw))
-            print(" cmp/raw   : "+str(cmp/raw))
-            print(" cmp/png   : "+str(cmp/png))
-
-            q2 = quad_image()
-            t = time()
-            q2.read_file("bbb")
-            print(" read      : "+str(time() - t))
-            remove("bbb")
-            t = time()
-            q2.decompress()
-            print(" dcmp      : "+str(time() - t))
-            nd2 = q2.get_channels()
-            pi = Image.fromarray(nd2)
-            print(str(th)+"-"+f)
-            pi.save(str(th)+"-"+f)
-
-def test_one():
-    fname = "test-images/room"
-    ext = "png"
-    img = Image.open(fname + "." + ext)
-    npdata = asarray(img)
-    png = getsize(fname + "." + ext)
-    print(" dimensions: "+str(npdata.shape))
-    print(" PNG       : "+str(png)+" bytes")
-    dims = npdata.shape
-    raw = dims[0] * dims[1] * dims[2]
-    print(" raw       : "+str(raw)+" bytes")
-    t = time()
-    qi = quad_image(npdata)
-    print(" construct : "+str(time() - t))#47 seconds
-    t = time()
-    qi.write_file(fname + "." + ext + ".qi")#310 seconds
-    print(" file      : "+str(time() - t))
-    qf = getsize(fname + "." + ext + ".qi")
-    print(" quad-image: "+str(qf)+" bytes")
-
-    t = time()
+    qi = quad_image(image_data)
     qi.compress()
-    print(" compress  : "+str(time() - t))#233 seconds
-    t = time()
-    qi.write_file(fname + "-c." + ext + ".qi") #5860 seconds
-    print(" file      : "+str(time() - t))
-    cmp = getsize(fname + "-c." + ext + ".qi")
-    print(" compressed: "+str(cmp)+" bytes")
-    
-    q2 = quad_image()
-    q2.read_file(fname + "-c." + ext + ".qi")
-    q2.decompress()
-    nd2 = q2.get_channels()
-    pi = Image.fromarray(nd2)
-    pi.save(fname + "-s." + ext)
+    qi.write_file(output_path)
 
-if __name__=="__main__":
-    test_one()
+    #return dimensions
+    return dims
+
+def reconstruct_image_from_file(compressed_image_file: str) -> Image:
+    qi = quad_image()
+    qi.read_file(compressed_image_file)
+    qi.decompress()
+
+    image_data = qi.get_channels()
+    return Image.fromarray(image_data)
+
+files = [
+    "64/barnacles.png",
+    "64/cooper.png",
+    "64/door.png",
+    "64/science.png",
+    "64/tree.png",
+    "256/barnacles.png",
+    "256/cooper.png",
+    "256/door.png",
+    "256/science.png",
+    "256/tree.png",
+    "1024/barnacles.png",
+    "1024/cooper.png",
+    "1024/door.png",
+    "1024/science.png",
+    "1024/tree.png"
+]
+
+results = open("results-original.csv", "w")
+results.write("file,ct,h,w,raw,cmp,og,cmp/raw,cmp/og,rt\n")
+
+for file in files:
+    try:
+        print(file)
+        l = file
+        name = ".".join(file.split(".")[:-1])
+        # Compress the image and encode is a binary file (any file extension can be chosen)
+        t = time()
+        dims = compress_image_file("input/"+file, "output-s/"+name+"_qt.qid")
+        l += ","+str(time() - t)
+        l += ","+str(dims[0])+","+str(dims[1])
+        raw = dims[0]*dims[1]*dims[2]
+        l += ","+str(raw)
+        cmp = getsize("output-s/"+name+"_qt.qid")
+        l += ","+str(cmp)
+        og = getsize("input/"+file)
+        l += ","+str(og)+","+str(cmp / raw)+","+str(cmp / og)
+
+        # Reconstruct the image from the binary file. (Returns a PIL.Image object)
+        t = time()
+        image = reconstruct_image_from_file("output-s/"+name+"_qt.qid")
+        l += ","+str(time() - t)
+        image.save("output-s/"+file)
+        results.write(l+"\n")
+    except ValueError as ve:
+        print(ve)
+results.close()
