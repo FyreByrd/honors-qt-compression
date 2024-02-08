@@ -107,17 +107,21 @@ def reconstruct_image_from_file(compressed_image_file: str) -> Image:
 #name = "StoneTile"
 
 files = [
-    "splotches.png",
-    "cooper.jpg",
-    "door.jpg",
-    #"dragon.png",
-    #"hills.png",
-    #"mountains.png",
-    "room.png",
-    #"sandwich.jpg",
-    #"science.jpg",
-    #"tree.jpg",
-    #"worst-square.png"
+    "64/barnacles.png",
+    "64/cooper.png",
+    "64/door.png",
+    "64/science.png",
+    "64/tree.png",
+    "256/barnacles.png",
+    "256/cooper.png",
+    "256/door.png",
+    "256/science.png",
+    "256/tree.png",
+    "1024/barnacles.png",
+    "1024/cooper.png",
+    "1024/door.png",
+    "1024/science.png",
+    "1024/tree.png"
 ]
 
 results = None
